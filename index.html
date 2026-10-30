@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Noor Abaya &amp; Hijab</title>
+  <link rel="stylesheet" href="style.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Noto+Naskh+Arabic:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="container nav-wrap">
+      <a href="#home" class="logo">
+        <!-- LOGO: earth-yellow circle with an arch (abaya shape) -->
+        <svg width="44" height="44" viewBox="0 0 44 44">
+          <circle cx="22" cy="22" r="21" fill="#DDA15E" />
+          <path d="M12 34V18a10 10 0 0 1 20 0v16" fill="none" stroke="#283618" stroke-width="3" />
+          <circle cx="22" cy="13" r="2.5" fill="#283618" />
+        </svg>
+        <span data-i18n="brand">Noor Abaya &amp; Hijab</span>
+      </a>
+
+      <nav class="nav" id="nav">
+        <a href="#home" data-page="home" data-i18n="nav_home">Home</a>
+        <a href="#shop" data-page="shop" data-i18n="nav_shop">Shop</a>
+        <a href="#about" data-page="about" data-i18n="nav_about">About Us</a>
+        <a href="#branches" data-page="branches" data-i18n="nav_branches">Branches</a>
+        <a href="#cart" data-page="cart">
+          <span data-i18n="nav_cart">Cart</span>
+          <span class="cart-count" id="cartCount">0</span>
+        </a>
+      </nav>
+
+      <div class="controls">
+        <input type="text" class="search-input" id="searchInput" data-i18n-placeholder="search_placeholder"
+          placeholder="Search abaya or hijab...">
+        <select id="langSelect">
+          <option value="en">English</option>
+          <option value="ur">اردو</option>
+          <option value="ar">العربية</option>
+        </select>
+        <button class="menu-btn" id="menuBtn">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- HOME PAGE -->
+    <section id="home" class="page active">
+      <div class="hero">
+        <h1 data-i18n="hero_title">Elegant Abayas &amp; Hijabs for Every Day</h1>
+        <p data-i18n="hero_text">Modest fashion made with quality fabric and care.</p>
+        <br>
+        <a href="#shop" class="btn btn-gold" data-i18n="shop_now">Shop Now</a>
+      </div>
+      <div class="container">
+        <h2 class="section-title" data-i18n="featured">Featured Products</h2>
+        <div class="grid" id="homeGrid"></div>
+      </div>
+    </section>
+
+    <!-- SHOP PAGE -->
+    <section id="shop" class="page">
+      <div class="container">
+        <h2 class="section-title" data-i18n="nav_shop">Shop</h2>
+
+        <!-- Country price section -->
+        <div class="country-box reveal">
+          <h3 data-i18n="choose_country">Choose Your Country</h3>
+          <p data-i18n="country_note">Prices change according to the country you select.</p>
+          <select id="countrySelect" class="country-select"></select>
+        </div>
+
+        <div class="filters">
+          <button class="filter-btn active" data-filter="all" data-i18n="filter_all">All</button>
+          <button class="filter-btn" data-filter="abaya" data-i18n="filter_abaya">Abayas</button>
+          <button class="filter-btn" data-filter="hijab" data-i18n="filter_hijab">Hijabs</button>
+        </div>
+
+        <div class="grid" id="productGrid"></div>
+      </div>
+    </section>
+
+    <!-- ABOUT PAGE -->
+    <section id="about" class="page">
+
+      <div class="container">
+
+        <h2 class="section-title" data-i18n="about_title">About Us</h2>
+
+        <!-- Intro -->
+        <div class="about-intro reveal">
+          <p class="about-text" data-i18n="about_text">Noor Abaya &amp; Hijab offers women elegant and modest clothing.
+            We care about quality, simplicity and modesty in every piece we make.</p>
+        </div>
+
+        <!-- Three boxes: mission, quality, service -->
+        <div class="grid about-grid">
+          <div class="card reveal">
+            <div class="about-icon">🌙</div>
+            <h3 data-i18n="about_mission_title">Our Mission</h3>
+            <p data-i18n="about_mission_text">To give every woman modest clothing that makes her feel confident,
+              comfortable and beautiful.</p>
+          </div>
+
+          <div class="card reveal">
+            <div class="about-icon">🧵</div>
+            <h3 data-i18n="about_quality_title">Quality Fabric</h3>
+            <p data-i18n="about_quality_text">Every abaya and hijab is made with carefully chosen fabric that is soft,
+              breathable and long lasting.</p>
+          </div>
+
+          <div class="card reveal">
+            <div class="about-icon">🤝</div>
+            <h3 data-i18n="about_service_title">Caring Service</h3>
+            <p data-i18n="about_service_text">Our team is ready to help you choose the right size and style, in every
+              branch and online.</p>
+          </div>
+        </div>
+
+        <!-- Story -->
+        <div class="about-story reveal">
+          <h3 data-i18n="about_story_title">Our Story</h3>
+          <p data-i18n="about_story_text">Noor started with a simple idea: modest fashion should be elegant, affordable
+            and available to women everywhere. Today we serve customers in many countries, and we keep growing with the
+            same goal, to bring quality and modesty together in every design.</p>
+        </div>
+
+        <!-- CONTACT -->
+        <h2 class="section-title reveal" data-i18n="contact_title">Contact Us</h2>
+
+        <div class="contact-grid">
+
+          <!-- Contact details -->
+          <div class="card reveal contact-info">
+            <h3 data-i18n="contact_info_title">Get in Touch</h3>
+            <p>📱 <a href="https://wa.me/923001234567" target="_blank" data-i18n="contact_whatsapp">WhatsApp: +92 300
+                123 4567</a></p>
+            <p>📞 <a href="tel:+923001234567">+92 300 123 4567</a></p>
+            <p>✉️ <a href="mailto:info@noorabaya.com">info@noorabaya.com</a></p>
+            <p>📍 <span data-i18n="contact_address">Karachi, Pakistan</span></p>
+            <p>🕘 <span data-i18n="contact_hours">Mon to Sat, 10:00 AM to 8:00 PM</span></p>
+          </div>
+
+          <!-- Contact form (WhatsApp par message bhejta hai) -->
+          <div class="card reveal">
+            <h3 data-i18n="contact_form_title">Send us a Message</h3>
+            <form id="contactForm" class="contact-form">
+              <input type="text" id="cName" data-i18n-placeholder="contact_name" placeholder="Your name" required>
+              <input type="email" id="cEmail" data-i18n-placeholder="contact_email" placeholder="Your email" required>
+              <textarea id="cMsg" rows="4" data-i18n-placeholder="contact_message" placeholder="Your message"
+                required></textarea>
+              <button type="submit" class="btn btn-gold" data-i18n="contact_send">Send on WhatsApp</button>
+            </form>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- BRANCHES PAGE -->
+    <section id="branches" class="page">
+      <div class="container">
+        <h2 class="section-title" data-i18n="branches_title">Our Branches</h2>
+        <div class="grid" id="branchGrid"></div>
+      </div>
+    </section>
+
+    <!-- CART PAGE -->
+    <section id="cart" class="page">
+      <div class="container narrow">
+        <h2 class="section-title" data-i18n="cart_title">Your Cart</h2>
+        <div id="cartItems"></div>
+        <div class="cart-total" id="cartTotal"></div>
+        <a id="checkoutBtn" class="btn btn-gold" target="_blank" data-i18n="checkout">Order on WhatsApp</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p data-i18n="footer_text">© 2026 Noor Abaya &amp; Hijab. All rights reserved.</p>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="common.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
