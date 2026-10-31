@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase | Shop Panel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container nav-wrap">
+            <span class="logo">Purchase (Kharidari)</span>
+            <div class="controls">
+                <a class="btn btn-small" href="user.html">Menu</a>
+                <button class="btn btn-small" id="logoutBtn">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <h2 class="section-title">Nayi Kharidari</h2>
+
+        <div class="card">
+            <div class="admin-form">
+                <input type="text" id="pname" placeholder="Product ka naam">
+                <input type="text" id="supplier" placeholder="Supplier (optional)">
+                <input type="number" id="qty" placeholder="Quantity" min="1">
+                <input type="number" id="rate" placeholder="Rate (fi unit)" min="0" step="0.01">
+                <input type="file" id="img" accept="image/*">
+                <input type="date" id="date">
+            </div>
+            <button class="btn btn-gold" id="saveBtn">Save Purchase</button>
+            <p class="msg" id="msg"></p>
+        </div>
+
+        <h2 class="section-title">Purchase List</h2>
+
+        <div style="overflow-x:auto;">
+            <table class="admin-table">
+                <tr>
+                    <th>Date</th>
+                    <th>Image</th>
+                    <th>Product</th>
+                    <th>Supplier</th>
+                    <th>Qty</th>
+                    <th>Rate</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+                <tbody id="rows"></tbody>
+            </table>
+        </div>
+        <p class="total-line">Grand Total: <strong id="grand">0</strong></p>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+      <script>
+    const el = (id) => document.getElementById(id);
+    const BUCKET = "purchase-images";
+
+    function showMsg(text) { el("msg").textContent = text; console.log(text); }
+
+    // Tasveer ka public link banata hai
+    function imageUrl(path) {
+      return db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+    }
+
+    // Tasveer Supabase Storage mein upload karta hai aur uska path wapas deta hai
+    async function uploadImage(file) {
+      const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const path = `${Date.now()}-${cleanName}`;
+      const { error } = await db.storage.from(BUCKET).upload(path, file);
+      if (error) throw error;
+      return path;
+    }
+
+    // Ek purchase delete karta hai (tasveer bhi)
+    async function removeRow(id, path) {
+      if (!confirm("Ye entry delete karni hai?")) return;
+      if (path) await db.storage.from(BUCKET).remove([path]);
+      const { error } = await db.from("purchases").delete().eq("id", id);
+      if (error) return showMsg("Delete error: " + error.message);
+      loadList();
+    }
+
+    // Save button: pehle tasveer upload, phir form ka data database mein
+    async function savePurchase() {
+      const btn = el("saveBtn");
+      const row = {
+        product_name: el("pname").value.trim(),
+        supplier: el("supplier").value.trim(),
+        quantity: Number(el("qty").value),
+        rate: Number(el("rate").value),
+        purchase_date: el("date").value
+      };
+
+      if (!row.product_name || row.quantity <= 0 || row.rate <= 0) {
+        return showMsg("Product, quantity aur rate sahi likhein.");
+      }
+
+      btn.disabled = true;
+      showMsg("Save ho raha hai...");
+
+      try {
+        const file = el("img").files[0];
+        if (file) row.image_path = await uploadImage(file);
+
+        const { error } = await db.from("purchases").insert(row);
+        if (error) throw error;
+
+        showMsg("Purchase save ho gayi!");
+        el("pname").value = "";
+        el("supplier").value = "";
+        el("qty").value = "";
+        el("rate").value = "";
+        el("img").value = "";
+        loadList();
+      } catch (err) {
+        showMsg("Save error: " + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // Database se list laa kar table mein dikhata hai
+    async function loadList() {
+      const { data, error } = await db
+        .from("purchases")
+        .select("*")
+        .order("purchase_date", { ascending: false });
+
+      if (error) return showMsg("Load error: " + error.message);
+
+      let grand = 0;
+      el("rows").innerHTML = data.map((r) => {
+        grand += Number(r.total);
+        const pic = r.image_path
+          ? `<img class="thumb" src="${imageUrl(r.image_path)}" alt="${r.product_name}">`
+          : "-";
+        return `<tr>
+          <td>${r.purchase_date}</td>
+          <td>${pic}</td>
+          <td>${r.product_name}</td>
+          <td>${r.supplier || ""}</td>
+          <td>${r.quantity}</td>
+          <td>${money(r.rate)}</td>
+          <td>${money(r.total)}</td>
+          <td><button class="remove" onclick="removeRow(${r.id}, '${r.image_path || ""}')">Delete</button></td>
+        </tr>`;
+      }).join("");
+      el("grand").textContent = money(grand);
+    }
+
+    // Page start: login check, date aaj ki, list load
+    async function init() {
+      const session = await requireLogin();
+      if (!session) return;
+      el("logoutBtn").addEventListener("click", logout);
+      el("saveBtn").addEventListener("click", savePurchase);
+      el("date").value = new Date().toISOString().slice(0, 10);
+      loadList();
+    }
+    init();
+  </script>
+</body>
+
+</html>

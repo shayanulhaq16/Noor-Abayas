@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales | Shop Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="container nav-wrap">
+      <span class="logo">Sales (Farokht)</span>
+      <div class="controls">
+        <a class="btn btn-small" href="user.html">Menu</a>
+        <button class="btn btn-small" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <h2 class="section-title">Nayi Sale</h2>
+
+    <div class="card">
+      <div class="admin-form">
+        <input type="text" id="pname" placeholder="Product ka naam">
+        <input type="text" id="customer" placeholder="Customer ka naam (optional)">
+        <input type="number" id="qty" placeholder="Quantity" min="1">
+        <input type="number" id="price" placeholder="Price (fi unit)" min="0" step="0.01">
+        <input type="date" id="date">
+      </div>
+      <button class="btn btn-gold" id="saveBtn">Save Sale</button>
+      <p class="msg" id="msg"></p>
+    </div>
+
+    <h2 class="section-title">Sales List</h2>
+
+    <div style="overflow-x:auto;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Date</th><th>Product</th><th>Customer</th>
+            <th>Qty</th><th>Price</th><th>Total</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <p class="total-line">Grand Total: <strong id="grand">0</strong></p>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script>
+    const el = (id) => document.getElementById(id);
+    function showMsg(text) { el("msg").textContent = text; }
+
+    // Table se ek sale delete karta hai
+    async function removeRow(id) {
+      if (!confirm("Ye entry delete karni hai?")) return;
+      const { error } = await db.from("sales").delete().eq("id", id);
+      if (error) return showMsg("Error: " + error.message);
+      loadList();
+    }
+
+    // Save button: form ka data database mein daalta hai
+    async function saveSale() {
+      const row = {
+        product_name: el("pname").value.trim(),
+        customer_name: el("customer").value.trim(),
+        quantity: Number(el("qty").value),
+        price: Number(el("price").value),
+        sale_date: el("date").value
+      };
+
+      if (!row.product_name || row.quantity <= 0 || row.price <= 0) {
+        return showMsg("Product, quantity aur price sahi likhein.");
+      }
+
+      const { error } = await db.from("sales").insert(row);
+      if (error) return showMsg("Error: " + error.message);
+
+      showMsg("Sale save ho gayi!");
+      el("pname").value = "";
+      el("customer").value = "";
+      el("qty").value = "";
+      el("price").value = "";
+      loadList();
+    }
+
+    // Database se list laa kar table mein dikhata hai
+    async function loadList() {
+      const { data, error } = await db
+        .from("sales")
+        .select("*")
+        .order("sale_date", { ascending: false });
+      if (error) return showMsg("Error: " + error.message);
+
+      let grand = 0;
+      el("rows").innerHTML = data.map((r) => {
+        grand += r.total;
+        return `<tr>
+          <td>${r.sale_date}</td>
+          <td>${r.product_name}</td>
+          <td>${r.customer_name || ""}</td>
+          <td>${r.quantity}</td>
+          <td>${money(r.price)}</td>
+          <td>${money(r.total)}</td>
+          <td><button class="remove" onclick="removeRow(${r.id})">Delete</button></td>
+        </tr>`;
+      }).join("");
+      el("grand").textContent = money(grand);
+    }
+
+    // Page start: login check, date aaj ki, list load
+    async function init() {
+      const session = await requireLogin();
+      if (!session) return;
+      el("logoutBtn").addEventListener("click", logout);
+      el("saveBtn").addEventListener("click", saveSale);
+      el("date").value = new Date().toISOString().slice(0, 10);
+      loadList();
+    }
+    init();
+  </script>
+</body>
+</html>
