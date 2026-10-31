@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop Login | Noor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="container nav-wrap">
+      <span class="logo">Shop Panel</span>
+    </div>
+  </header>
+
+  <main class="container narrow">
+
+    <!-- Login box (logout hone par dikhta hai) -->
+    <div id="loginBox" class="card admin-box">
+      <h2 class="section-title">Shop Login</h2>
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="password" placeholder="Password">
+      <button class="btn btn-gold" id="loginBtn">Login</button>
+      <p class="msg" id="loginMsg"></p>
+    </div>
+
+    <!-- Menu (login hone ke baad dikhta hai) -->
+    <div id="menuBox" class="card admin-box" hidden>
+      <h2 class="section-title">Welcome</h2>
+      <p>Logged in: <strong id="whoami"></strong></p>
+      <a class="btn btn-gold btn-block" href="purchase.html">Purchase (Kharidari)</a>
+      <a class="btn btn-gold btn-block" href="sales.html">Sales (Farokht)</a>
+      <button class="btn btn-block" id="logoutBtn">Logout</button>
+    </div>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script>
+    const loginBox = document.getElementById("loginBox");
+    const menuBox = document.getElementById("menuBox");
+
+    // Check karta hai login hai ya nahi, aur sahi box dikhata hai
+    async function showState() {
+      const { data } = await db.auth.getSession();
+      if (data.session) {
+        loginBox.hidden = true;
+        menuBox.hidden = false;
+        document.getElementById("whoami").textContent = data.session.user.email;
+      } else {
+        loginBox.hidden = false;
+        menuBox.hidden = true;
+      }
+    }
+
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const { error } = await db.auth.signInWithPassword({ email, password });
+      if (error) {
+        document.getElementById("loginMsg").textContent = "Login nahi hua: " + error.message;
+      } else {
+        document.getElementById("loginMsg").textContent = "";
+        showState();
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", logout);
+
+    showState();
+  </script>
+</body>
+</html>
